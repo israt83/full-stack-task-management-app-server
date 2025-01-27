@@ -13,7 +13,6 @@ app.use(express.json());
 
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.swu9d.mongodb.net/?retryWrites=true&w=majority`;
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.nghfy93.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -71,10 +70,7 @@ async function run() {
     }
 
     // users related api
-    // app.get('/users',verifyAdmin, verifyToken, async (req, res) => {
-    //   const result = await userCollection.find().toArray();
-    //   res.send(result);
-    // });
+   
     app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
@@ -98,8 +94,7 @@ async function run() {
 
     app.post('/users', async (req, res) => {
       const user = req.body;
-      // insert email if user doesnt exists: 
-      // you can do this many ways (1. email unique, 2. upsert 3. simple checking)
+ 
       const query = { email: user.email }
       const existingUser = await userCollection.findOne(query);
       if (existingUser) {
@@ -229,7 +224,7 @@ async function run() {
       const payment = req.body;
       const paymentResult = await paymentCollection.insertOne(payment);
 
-      //  carefully delete each item from the cart
+  
       console.log('payment info', payment);
       const query = {
         _id: {
@@ -248,9 +243,7 @@ async function run() {
       const menuItems = await menuCollection.estimatedDocumentCount();
       const orders = await paymentCollection.estimatedDocumentCount();
 
-      // this is not the best way
-      // const payments = await paymentCollection.find().toArray();
-      // const revenue = payments.reduce((total, payment) => total + payment.price, 0);
+  
 
       const result = await paymentCollection.aggregate([
         {
@@ -275,14 +268,6 @@ async function run() {
 
 
     // order status
-    /**
-     * ----------------------------
-     *    NON-Efficient Way
-     * ------------------------------
-     * 1. load all the payments
-     * 2. for every menuItemIds (which is an array), go find the item from menu collection
-     * 3. for every item in the menu collection that you found from a payment entry (document)
-    */
 
     // using aggregate pipeline
     app.get('/order-stats', verifyToken, verifyAdmin, async(req, res) =>{
@@ -334,22 +319,10 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-  res.send('boss is sitting')
+  res.send('FoodHop is sitting')
 })
 
 app.listen(port, () => {
-  console.log(`Bistro boss is sitting on port ${port}`);
+  console.log(`FoodHop is sitting on port ${port}`);
 })
 
-/**
- * --------------------------------
- *      NAMING CONVENTION
- * --------------------------------
- * app.get('/users')
- * app.get('/users/:id')
- * app.post('/users')
- * app.put('/users/:id')
- * app.patch('/users/:id')
- * app.delete('/users/:id')
- * 
-*/
